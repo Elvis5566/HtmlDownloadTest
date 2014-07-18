@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Toast;
 
 import java.io.FileOutputStream;
@@ -18,15 +19,24 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends Activity {
     ProgressDialog mProgressDialog;
-
+    WebView mWebview;
+    String[] downloadUrlArr = {"http://2-dot-turing-link-630.appspot.com/index.html",
+                                  "http://2-dot-turing-link-630.appspot.com/1.jpg"};
+    String[] fileNameArr = {"index.html",
+                              "1.jpg"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mWebview = (WebView) findViewById(R.id.webview);
+        mWebview.getSettings().setJavaScriptEnabled(true);
+        mWebview.loadUrl("file:///sdcard/downloadTest/index.html");
         mProgressDialog = new ProgressDialog(MainActivity.this);
         mProgressDialog.setMessage("A message");
         mProgressDialog.setIndeterminate(true);
@@ -37,8 +47,11 @@ public class MainActivity extends Activity {
 
     public void onClick(View v) {
         Log.d("Elvis", "click");
-        final DownloadTask downloadTask = new DownloadTask(MainActivity.this);
-        downloadTask.execute("http://2-dot-turing-link-630.appspot.com/index.html");
+        for (int i = 0; i < downloadUrlArr.length; ++i) {
+            DownloadTask downloadTask = new DownloadTask(MainActivity.this);
+            downloadTask.execute(downloadUrlArr[i], fileNameArr[i]);
+        }
+
     }
 
     @Override
@@ -92,7 +105,7 @@ public class MainActivity extends Activity {
 
                 // download the file
                 input = connection.getInputStream();
-                output = new FileOutputStream("/sdcard/file_name.downloadTest");
+                output = new FileOutputStream("/sdcard/downloadTest/" + sUrl[1]);
 
                 byte data[] = new byte[4096];
                 long total = 0;
